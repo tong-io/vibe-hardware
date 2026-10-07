@@ -1,0 +1,304 @@
+[
+ {
+  "id": "a01",
+  "text": "先来猜个谜。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "asr": "先来猜个迷。"
+ },
+ {
+  "id": "a02",
+  "text": "天平左边，放着一个盒子和 3 颗糖；右边，放着 7 颗糖。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "天平左边，放着一个盒子和三颗糖；右边，放着七颗糖。"
+ },
+ {
+  "id": "a03",
+  "text": "天平是平的。盒子里有几颗糖？",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a04",
+  "text": "你可能一下就猜出来了：4 颗。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "你可能一下就猜出来了：四颗。"
+ },
+ {
+  "id": "a05",
+  "text": "恭喜，你刚刚解了一个方程！今天，我们把这种“猜”，变成一套谁都会的方法。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a06",
+  "text": "第一步：等号，就是天平。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a07",
+  "text": "我们把盒子里的糖数，叫做 x。这架天平，就可以写成：x 加 3 等于 7。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "我们把盒子里的糖数，叫做x。这架天平，就可以写成：x加三，等于七。"
+ },
+ {
+  "id": "a08",
+  "text": "等号的意思是：左右两边一样重。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a09",
+  "text": "想知道 x，就得让盒子单独留在一边。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "想知道x，就得让盒子单独留在一边。"
+ },
+ {
+  "id": "a10",
+  "text": "要是只从右边拿走 3 颗呢？天平马上就歪了。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "要是只从右边拿走三颗呢？天平马上就歪了。"
+ },
+ {
+  "id": "a11",
+  "text": "所以，两边要一起拿：左边拿走 3 颗，右边也拿走 3 颗。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "所以，两边要一起拿：左边拿走三颗，右边也拿走三颗。"
+ },
+ {
+  "id": "a12",
+  "text": "天平还是平的。左边只剩盒子，右边剩 4 颗。x 等于 4。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "天平还是平的。左边只剩盒子，右边剩四颗。x等于四。"
+ },
+ {
+  "id": "a13",
+  "text": "这就是整节课最重要的一句话：两边做同样的事，天平就不会歪。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a14",
+  "text": "第二步：被减掉的，就加回来。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "asr": "第二步,被剪掉的,就加回来。"
+ },
+ {
+  "id": "a15",
+  "text": "一只小老鼠，从盒子里偷吃了 2 颗糖。剩下的，和右边 5 颗一样重。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "一只小老鼠，从盒子里偷吃了两颗糖。剩下的，和右边五颗一样重。"
+ },
+ {
+  "id": "a16",
+  "text": "写出来就是：x 减 2 等于 5。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "写出来就是：x减二，等于五。"
+ },
+ {
+  "id": "a17",
+  "text": "盒子少了 2 颗，那就给两边，各放回 2 颗。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "盒子少了两颗，那就给两边，各放回两颗。",
+  "asr": "盒子少了两颗,那就给两边,各放回两颗。"
+ },
+ {
+  "id": "a18",
+  "text": "左边又是完整的一盒；右边，5 加 2，是 7 颗。x 等于 7。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "左边又是完整的一盒；右边，五加二，是七颗。x等于七。"
+ },
+ {
+  "id": "a19",
+  "text": "你可能听过“移项要变号”：减 2 从左边跳到右边，就变成了加 2。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "你可能听过“移项要变号”：减二从左边跳到右边，就变成了加二。",
+  "asr": "你可能听过一下要变好,解二从左边跳到右边,就变成了加二。"
+ },
+ {
+  "id": "a20",
+  "text": "它其实就是“两边同时加 2”的简写。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "它其实就是“两边同时加二”的简写。"
+ },
+ {
+  "id": "a21",
+  "text": "第三步：乘了就除，除了就乘。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "asr": "第三步,成了就除,除了就成。"
+ },
+ {
+  "id": "a22",
+  "text": "现在左边有 3 个一模一样的盒子，右边是 12 颗糖。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "现在左边有三个一模一样的盒子，右边是十二颗糖。"
+ },
+ {
+  "id": "a23",
+  "text": "3 个 x，写作 3x，意思是 3 乘 x。所以：3x 等于 12。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "三个x，写作三x，意思是三乘x。所以：三x，等于十二。"
+ },
+ {
+  "id": "a24",
+  "text": "把两边都平均分成 3 份：一个盒子，对应 4 颗糖。x 等于 4。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "把两边都平均分成三份：一个盒子，对应四颗糖。x等于四。"
+ },
+ {
+  "id": "a25",
+  "text": "反过来：半个盒子，有 5 颗糖。也就是 x 除以 2，等于 5。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "反过来：半个盒子，有五颗糖。也就是x除以二，等于五。"
+ },
+ {
+  "id": "a26",
+  "text": "两边都乘 2，凑回一整盒：x 等于 10。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "两边都乘二，凑回一整盒：x等于十。",
+  "asr": "两边都乘二,凑合一整合,X等于十。"
+ },
+ {
+  "id": "a27",
+  "text": "第四步：倒着拆。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "asr": "第四步 导致拆。"
+ },
+ {
+  "id": "a28",
+  "text": "3 个盒子，再加 2 颗散糖，一共 14 颗。写成：3x 加 2 等于 14。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "三个盒子，再加两颗散糖，一共十四颗。写成：三x加二，等于十四。"
+ },
+ {
+  "id": "a29",
+  "text": "这就像拆快递：最后包上的那一层，要最先拆开。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a30",
+  "text": "先拿走散糖：两边减 2，得到 3x 等于 12。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "先拿走散糖：两边减二，得到三x等于十二。"
+ },
+ {
+  "id": "a31",
+  "text": "再平均分成 3 份：两边除以 3，x 等于 4。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "再平均分成三份：两边除以三，x等于四。",
+  "asr": "在平均分成三分,两边处以三,X等于四。"
+ },
+ {
+  "id": "a32",
+  "text": "最后放回去检查：每盒 4 颗，3 盒 12 颗，加上 2 颗，正好 14。对了！",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "最后放回去检查：每盒四颗，三盒十二颗，加上两颗，正好十四。对了！",
+  "asr": "最后放回去检查,每合四颗,三颗十二颗,加上两颗,正好十四。对了。"
+ },
+ {
+  "id": "a33",
+  "text": "第五步：公式变形。公式，就是一架写好规则的天平。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a34",
+  "text": "比如买东西：总价，等于单价，乘以数量。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a35",
+  "text": "你买了 4 杯奶茶，一共花了 60 元。一杯多少钱？",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "你买了四杯奶茶，一共花了六十元。一杯多少钱？"
+ },
+ {
+  "id": "a36",
+  "text": "单价被乘了 4，那就两边同时除以 4：单价等于 60 除以 4，等于 15 元。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "单价被乘了四，那就两边同时除以四：单价，等于六十除以四，等于十五元。"
+ },
+ {
+  "id": "a37",
+  "text": "把数字换回文字：单价，等于总价除以数量。这就叫公式变形。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a38",
+  "text": "公式里的文字和字母，就像盒子 x：只是还没打开的数。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "公式里的文字和字母，就像盒子x：只是还没打开的数。",
+  "asr": "公式里的文字和字母,就像合字x,只是还没打开的数。"
+ },
+ {
+  "id": "a39",
+  "text": "最后，带走三句话。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a40",
+  "text": "一，等号是天平。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "asr": "1. 等号是天评。"
+ },
+ {
+  "id": "a41",
+  "text": "二，两边做同样的事，让 x 单独留下。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "二，两边做同样的事，让x单独留下。"
+ },
+ {
+  "id": "a42",
+  "text": "三，倒着拆，最后放回去检查。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a43",
+  "text": "现在，打开开头那个盒子看看。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%"
+ },
+ {
+  "id": "a44",
+  "text": "果然，4 颗。下次遇到方程，你也能把盒子打开。",
+  "voice": "zh-CN-XiaoxiaoNeural",
+  "rate": "-6%",
+  "say": "果然，四颗。下次遇到方程，你也能把盒子打开。"
+ }
+]

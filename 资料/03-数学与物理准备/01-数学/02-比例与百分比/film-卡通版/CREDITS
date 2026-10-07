@@ -1,0 +1,17 @@
+比例与百分比— Mid-century Cartoon
+All pictures are drawn by code (engine/, film.js). No generated images, no third-party artwork.
+
+Engine and method
+  engine/toon.js and engine/chars.js (rig; the teacher is restyled; shared with lesson 1) are adapted from the Lemo-Opuscar
+  library (github.com/lemomo-ai/lemo-opuscar), MIT License, Copyright (c) 2026 LemoLab.
+Fonts (SIL Open Font License 1.1, via Google Fonts)
+  Alfa Slab One (JM Solé), Jost (Owen Earl), Oleo Script (soytutype), ZCOOL QingKe HuangYou (ZCOOL),
+  Noto Sans SC (Google; subset). Licence texts: fonts/OFL-*.txt.
+Voice
+  Microsoft Edge neural TTS (zh-CN-XiaoxiaoNeural) via edge-tts — check Microsoft's terms before commercial use.
+  Speech check: faster-whisper (MIT), Whisper "small" (MIT).
+Music samples
+  Versilian Community Sample Library, VS Chamber Orchestra: Community Edition (Versilian Studios, CC0 1.0);
+  Karoryfer Samples "Sneakybass" (CC0 1.0). Instruments used: see music/credits.txt.
+Score, foley and sound design
+  Original, synthesized in music.py and mix.py.

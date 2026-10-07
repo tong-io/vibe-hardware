@@ -1,0 +1,15 @@
+比例与百分比（积木版）— Brick Toy
+All pictures are rendered from code with three.js (main.js, set.js, bricks.js). No generated images, no third-party artwork.
+No brand: bricks are generic interlocking toy bricks; studs carry no lettering.
+
+Engine and method
+  bricks.js (brick geometry and plastic materials) and the desk/lighting setup in set.js are adapted from the Lemo-Opuscar
+  library (github.com/lemomo-ai/lemo-opuscar), MIT License, Copyright (c) 2026 LemoLab. Post-processing: core/three/post.js.
+3D assets (CC0, Poly Haven): photo_studio_loft_hall HDRI, american_walnut_veneer textures, tea_set_01.
+Fonts (SIL Open Font License 1.1, via Google Fonts): ZCOOL KuaiLe (ZCOOL), Noto Sans SC (Google) — subsets.
+Voice
+  Microsoft Edge neural TTS (zh-CN-XiaoxiaoNeural) via edge-tts — check Microsoft's terms before commercial use.
+  Speech check: faster-whisper (MIT), Whisper "small" (MIT).
+Music samples (CC0 1.0): FreePats project, Versilian Community Sample Library, VS Chamber Orchestra: Community Edition.
+  Instruments used: see music/credits.txt.
+Score, foley and sound design: original, synthesized in music.py and mix.py.
