@@ -1,0 +1,330 @@
+<title>电阻 · 硬件课 §4.4</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column like a lab notebook; figures sit on "board" panels; copper = conductors, solder-mask green = diagrams */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --fg:#1b2427; --muted:#5a676d; --rule:#d5dde0;
+  --copper:#b25f25; --copper-soft:#f4e3d6; --mask:#2c6b5a; --mask-soft:#dcebe6; --warn:#a33a2a;
+  --display:"Noto Serif SC","Songti SC",serif;
+  --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111719; --surface:#182124; --fg:#e3eaec; --muted:#97a5ab; --rule:#2b373b;
+  --copper:#e3904f; --copper-soft:#3a2617; --mask:#62b79c; --mask-soft:#16302a; --warn:#ef7d6a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111719; --surface:#182124; --fg:#e3eaec; --muted:#97a5ab; --rule:#2b373b;
+  --copper:#e3904f; --copper-soft:#3a2617; --mask:#62b79c; --mask-soft:#16302a; --warn:#ef7d6a; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font:16px/1.8 var(--body);padding-inline:16px;padding-block:32px 64px}
+main{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2{font-family:var(--display);text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(2.2rem,7vw,3.2rem);font-weight:900}
+h2{font-size:1.45rem;font-weight:600;display:flex;gap:12px;align-items:baseline}
+h2 .n{font:600 .8rem var(--mono);color:var(--copper);letter-spacing:.08em;flex:none}
+p{margin:0}
+section{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:500 .8rem var(--mono);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.lede{color:var(--muted)}
+.puzzle{border-left:3px solid var(--copper);padding:4px 0 4px 16px;font-weight:500}
+.key{background:var(--mask-soft);border-radius:6px;padding:14px 18px}
+.key b{color:var(--mask)}
+.formula{font:600 1.25rem var(--mono);text-align:center;padding:10px 0;color:var(--fg)}
+.formula .c{color:var(--copper)}
+code,.mono{font-family:var(--mono);font-size:.92em}
+figure{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:10px}
+figcaption{font-size:.85rem;color:var(--muted)}
+.scroll{overflow-x:auto}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--body);fill:var(--fg)}
+svg .m{font-family:var(--mono)}
+svg .mut{fill:var(--muted)}
+svg .cu{fill:var(--copper)}
+svg .gr{fill:var(--mask)}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:700;color:var(--muted);font-size:.82rem;letter-spacing:.04em}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+pre{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;overflow-x:auto;font:14px/1.7 var(--mono)}
+.warn{color:var(--warn);font-weight:700}
+ol.sum{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px}
+
+/* calculator */
+.calc{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:14px}
+.calc label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.calc select,.calc input[type=range]{font:inherit;color:var(--fg);width:100%}
+.calc select{background:var(--bg);border:1px solid var(--rule);border-radius:4px;padding:6px}
+.calc output{font:600 1rem var(--mono);color:var(--fg)}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.readout div{border-top:2px solid var(--rule);padding-top:6px;display:flex;flex-direction:column}
+.readout span{font-size:.8rem;color:var(--muted)}
+.readout strong{font:600 1.35rem var(--mono);font-variant-numeric:tabular-nums}
+.readout .hot strong{color:var(--copper)}
+.bar{height:14px;background:var(--mask-soft);border-radius:3px;overflow:hidden;display:flex}
+.bar i{display:block;background:var(--mask)}
+.bar b{display:block;background:var(--copper)}
+:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+</style>
+
+<main>
+<header style="display:flex;flex-direction:column;gap:10px">
+  <span class="eyebrow">第二阶段 电学基础 · §4.4</span>
+  <h1>电阻</h1>
+  <p class="lede">初中学过 V = IR。这一课从做板子的角度看：导线和走线自己也有电阻，电阻元件怎么选、怎么读。</p>
+  <p class="puzzle">开场谜题：同一个 5V 2A 充电头，配一根又长又细的便宜数据线，手机充得明显变慢；换根粗短的线就快了。线不就是"通路"吗，为什么会影响充电？</p>
+</header>
+
+<section>
+  <h2><span class="n">STEP 1</span>电阻由什么决定</h2>
+  <p>初中讲过：导线越长、越细，电阻越大，材料也有关系。写成公式：</p>
+  <div class="formula">R = <span class="c">ρ</span> × L ÷ A</div>
+  <figure>
+    <svg viewBox="0 0 640 210" role="img" aria-label="导线电阻和长度成正比，和截面积成反比">
+      <g>
+        <ellipse cx="60" cy="60" rx="10" ry="22" fill="var(--copper-soft)" stroke="var(--copper)" stroke-width="2"/>
+        <rect x="60" y="38" width="200" height="44" fill="var(--copper-soft)"/>
+        <line x1="60" y1="38" x2="260" y2="38" stroke="var(--copper)" stroke-width="2"/>
+        <line x1="60" y1="82" x2="260" y2="82" stroke="var(--copper)" stroke-width="2"/>
+        <ellipse cx="260" cy="60" rx="10" ry="22" fill="var(--copper)" />
+        <text x="160" y="110" text-anchor="middle" class="mut" font-size="14">短、粗：电阻小</text>
+      </g>
+      <g>
+        <ellipse cx="340" cy="60" rx="5" ry="10" fill="var(--copper-soft)" stroke="var(--copper)" stroke-width="2"/>
+        <rect x="340" y="50" width="270" height="20" fill="var(--copper-soft)"/>
+        <line x1="340" y1="50" x2="610" y2="50" stroke="var(--copper)" stroke-width="2"/>
+        <line x1="340" y1="70" x2="610" y2="70" stroke="var(--copper)" stroke-width="2"/>
+        <ellipse cx="610" cy="60" rx="5" ry="10" fill="var(--copper)"/>
+        <text x="475" y="110" text-anchor="middle" class="mut" font-size="14">长、细：电阻大</text>
+      </g>
+      <line x1="60" y1="150" x2="610" y2="150" stroke="var(--rule)" stroke-width="1"/>
+      <text x="60" y="180" font-size="15"><tspan class="cu m" font-weight="600">ρ</tspan> 电阻率：材料本身有多"难走"</text>
+      <text x="60" y="203" font-size="15"><tspan class="m" font-weight="600">L</tspan> 长度　　<tspan class="m" font-weight="600">A</tspan> 横截面积（"管子"有多粗）</text>
+    </svg>
+    <figcaption>长度翻倍，电阻翻倍；截面积翻倍，电阻减半。和水管一样：管子越长越细，水越难流。</figcaption>
+  </figure>
+  <p><b>电阻率 ρ</b> 是材料的固有属性，单位 Ω·m。它的倒数叫<b>电导率</b>，表示材料有多容易导电。</p>
+  <div class="scroll"><table>
+    <thead><tr><th>材料</th><th>电阻率 ρ（Ω·m）</th><th>用在哪</th></tr></thead>
+    <tbody>
+      <tr><td>银</td><td class="num">1.59 × 10⁻⁸</td><td>最好的导体，太贵，只用在触点镀层</td></tr>
+      <tr><td><b>铜</b></td><td class="num">1.68 × 10⁻⁸</td><td>导线、PCB 走线，几乎一切</td></tr>
+      <tr><td>铝</td><td class="num">2.65 × 10⁻⁸</td><td>高压输电线（轻、便宜）</td></tr>
+      <tr><td>镍铬合金</td><td class="num">1.1 × 10⁻⁶</td><td>电热丝、电阻元件（比铜大 65 倍）</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">STEP 2</span>导线自己也有电阻</h2>
+  <p>做电路时总把导线当成"电阻为 0"。电流小的时候没问题，电流一大，导线电阻就不能忽略了。算一根普通 1 米 USB 线（电源线规格 AWG28，截面积 0.08 mm²）：</p>
+  <pre>电流要走一个来回：去 1 m + 回 1 m = 2 m
+R = 1.68×10⁻⁸ Ω·m × 2 m ÷ (0.08×10⁻⁶ m²) ≈ 0.42 Ω
+2 A 时导线上的压降：V = 2 A × 0.42 Ω ≈ 0.84 V</pre>
+  <figure>
+    <div class="scroll"><svg viewBox="0 0 640 220" role="img" aria-label="5V 经过导线后到手机只剩 4.16V">
+      <rect x="20" y="40" width="110" height="140" rx="8" fill="var(--mask-soft)" stroke="var(--mask)" stroke-width="2"/>
+      <text x="75" y="100" text-anchor="middle" font-size="15" font-weight="700">充电头</text>
+      <text x="75" y="126" text-anchor="middle" class="m gr" font-size="18" font-weight="600">5.00 V</text>
+      <rect x="510" y="40" width="110" height="140" rx="8" fill="var(--mask-soft)" stroke="var(--mask)" stroke-width="2"/>
+      <text x="565" y="100" text-anchor="middle" font-size="15" font-weight="700">手机</text>
+      <text x="565" y="126" text-anchor="middle" class="m cu" font-size="18" font-weight="600">4.16 V</text>
+      <!-- top wire VBUS -->
+      <line x1="130" y1="70" x2="270" y2="70" stroke="var(--copper)" stroke-width="3"/>
+      <rect x="270" y="58" width="100" height="24" rx="3" fill="var(--surface)" stroke="var(--copper)" stroke-width="2.5"/>
+      <text x="320" y="75" text-anchor="middle" class="m" font-size="13">0.21 Ω</text>
+      <line x1="370" y1="70" x2="510" y2="70" stroke="var(--copper)" stroke-width="3"/>
+      <text x="320" y="44" text-anchor="middle" font-size="13" class="cu">VBUS 线上掉 0.42 V</text>
+      <!-- bottom wire GND -->
+      <line x1="130" y1="150" x2="270" y2="150" stroke="var(--muted)" stroke-width="3"/>
+      <rect x="270" y="138" width="100" height="24" rx="3" fill="var(--surface)" stroke="var(--muted)" stroke-width="2.5"/>
+      <text x="320" y="155" text-anchor="middle" class="m" font-size="13">0.21 Ω</text>
+      <line x1="370" y1="150" x2="510" y2="150" stroke="var(--muted)" stroke-width="3"/>
+      <text x="320" y="190" text-anchor="middle" font-size="13" class="mut">GND 线上也掉 0.42 V</text>
+      <text x="200" y="62" class="m mut" font-size="12">2 A →</text>
+      <text x="420" y="172" class="m mut" font-size="12">← 2 A</text>
+    </svg></div>
+    <figcaption>去线和回线各 1 米、各 0.21 Ω，各掉 0.42 V。手机两端只剩 5.00 − 0.84 = 4.16 V。回线就是上一课说的 GND，它也有电阻。</figcaption>
+  </figure>
+  <p>手机发现电压掉下去，就会主动降低充电电流，于是充得慢。下面可以自己调一调：</p>
+  <figure>
+    <div class="calc">
+      <label for="len">线长 <output id="lenOut">1.0 m</output><input id="len" type="range" min="0.25" max="3" step="0.25" value="1"></label>
+      <label for="awg">线规（越大越细）
+        <select id="awg">
+          <option value="0.0804" selected>AWG28 · 0.08 mm²（便宜细线）</option>
+          <option value="0.128">AWG26 · 0.13 mm²</option>
+          <option value="0.205">AWG24 · 0.21 mm²</option>
+          <option value="0.326">AWG22 · 0.33 mm²</option>
+          <option value="0.518">AWG20 · 0.52 mm²（快充粗线）</option>
+        </select></label>
+      <label for="cur">电流 <output id="curOut">2.0 A</output><input id="cur" type="range" min="0.5" max="3" step="0.1" value="2"></label>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="barOk"></i><b id="barDrop"></b></div>
+    <div class="readout">
+      <div><span>来回总电阻</span><strong id="rOut">–</strong></div>
+      <div class="hot"><span>线上压降</span><strong id="dOut">–</strong></div>
+      <div><span>手机端电压</span><strong id="vOut">–</strong></div>
+      <div class="hot"><span>线上发热</span><strong id="pOut">–</strong></div>
+    </div>
+    <figcaption>绿色是到达手机的电压，铜色是在线上白白损失的部分（按 5 V 计算）。快充线做得粗，就是为了让这段铜色变短。</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2><span class="n">STEP 3</span>PCB 走线也是导线</h2>
+  <p>电路板上的走线是一层很薄的铜箔。最常见的厚度叫 <b>1 oz（1 盎司）</b>，约 <span class="mono">35 µm</span>，比头发丝还薄。</p>
+  <pre>一根 0.2 mm 宽、10 mm 长的信号线：
+A = 0.2 mm × 0.035 mm = 0.007 mm²
+R = 1.68×10⁻⁸ × 0.01 ÷ (0.007×10⁻⁶) ≈ 0.024 Ω</pre>
+  <ul style="margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px">
+    <li>走信号（几 mA）：0.024 Ω 完全可以忽略</li>
+    <li>走电机电流（2 A）：压降 0.05 V，还会发热。<b>大电流走线必须加宽</b>，粗略经验是 1 oz 铜、1 mm 宽，外层走线能过 2 A 左右</li>
+  </ul>
+  <p>所以电路板上电源线、地线总是又宽又粗，信号线细细的。上一课讲的"地弹"，根源就是 GND 走线的这点电阻。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 4</span>电阻会随温度变</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>材料</th><th>温度升高时</th><th>硬件里的意义</th></tr></thead>
+    <tbody>
+      <tr><td>金属（铜）</td><td>电阻<b>变大</b>，每升 1 °C 约 +0.4%</td><td>线越热电阻越大，越大越热，大电流时要留余量</td></tr>
+      <tr><td><b>NTC 热敏电阻</b></td><td>电阻<b>变小</b>，每升 1 °C 约 −4%</td><td>专门用来测温度：电池包、充电器、3D 打印机热床</td></tr>
+      <tr><td>普通电阻元件</td><td>几乎不变</td><td>设计时就是要它稳定</td></tr>
+    </tbody>
+  </table></div>
+  <p>NTC 是你见到的第一个<b>传感器</b>：把温度变化变成电阻变化，再用分压电路变成电压，MCU 的 ADC 一读就知道温度。§5 学分压时会接上。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 5</span>电阻元件：为什么没有 50 Ω 的电阻</h2>
+  <p>去买电阻会发现：有 47 Ω、56 Ω，就是没有 50 Ω。电阻值不是随便取的，而是一套<b>标准系列</b>。最常用的 E12 系列，每 10 倍里只有 12 个值：</p>
+  <figure>
+    <div class="scroll"><svg viewBox="0 0 620 135" role="img" aria-label="E12 系列在对数轴上等间距分布，正负10%误差带首尾相接">
+      <line x1="30" y1="80" x2="570" y2="80" stroke="var(--rule)" stroke-width="2"/>
+      <g id="e12"></g>
+    </svg></div>
+    <figcaption>对数刻度：每个值约比前一个大 1.2 倍。灰色是 ±10% 误差范围，一个接一个，把整段覆盖住。每个值乘 10、100、1000 都能用：4.7 Ω、47 Ω、470 Ω、4.7 kΩ、47 kΩ 都是标准值。</figcaption>
+  </figure>
+  <p>为什么这样设计：老式电阻精度只有 ±10%。标称 47 Ω 的电阻，实际可能在 42 ~ 52 Ω 之间；标称 56 Ω 的，可能在 50 ~ 62 Ω 之间。造一个"50 Ω"出来毫无意义，它本来就落在 47 和 56 的误差范围里。精度更高的电阻（±1%）就用更密的 E96 系列，每 10 倍 96 个值。</p>
+  <div class="key"><b>实用结论：</b>算出来需要 50 Ω，就选最接近的标准值 47 Ω 或 51 Ω（E24 里有），再验算一遍结果能不能接受。</div>
+</section>
+
+<section>
+  <h2><span class="n">STEP 6</span>读懂电阻上的标记</h2>
+  <p><b>插件电阻用色环</b>。四环电阻：前两环是数字，第三环是乘 10 的几次方，第四环是精度。</p>
+  <figure>
+    <div class="scroll"><svg viewBox="0 0 640 250" role="img" aria-label="4.7千欧电阻色环：黄 紫 红 金">
+      <line x1="40" y1="70" x2="180" y2="70" stroke="var(--muted)" stroke-width="4"/>
+      <line x1="460" y1="70" x2="600" y2="70" stroke="var(--muted)" stroke-width="4"/>
+      <rect x="180" y="35" width="280" height="70" rx="30" fill="#d8c29d" stroke="#a88f65" stroke-width="2"/>
+      <rect x="225" y="35" width="22" height="70" fill="#f2c80f"/>
+      <rect x="270" y="35" width="22" height="70" fill="#7b3fa8"/>
+      <rect x="315" y="35" width="22" height="70" fill="#d0312d"/>
+      <rect x="400" y="35" width="22" height="70" fill="#c9a43a"/>
+      <g font-size="14" text-anchor="middle">
+        <text x="236" y="135">黄</text><text x="236" y="158" class="m" font-weight="600">4</text>
+        <text x="281" y="135">紫</text><text x="281" y="158" class="m" font-weight="600">7</text>
+        <text x="326" y="135">红</text><text x="326" y="158" class="m" font-weight="600">× 10²</text>
+        <text x="411" y="135">金</text><text x="411" y="158" class="m" font-weight="600">±5%</text>
+      </g>
+      <text x="320" y="205" text-anchor="middle" font-size="17">47 × 100 = <tspan class="m cu" font-weight="600">4700 Ω = 4.7 kΩ</tspan></text>
+      <text x="320" y="232" text-anchor="middle" font-size="13" class="mut">从靠近一端的那环开始读；金、银色环在最后</text>
+    </svg></div>
+  </figure>
+  <div class="scroll"><table>
+    <thead><tr><th>颜色</th><th>黑</th><th>棕</th><th>红</th><th>橙</th><th>黄</th><th>绿</th><th>蓝</th><th>紫</th><th>灰</th><th>白</th></tr></thead>
+    <tbody><tr><td>数字</td><td class="num">0</td><td class="num">1</td><td class="num">2</td><td class="num">3</td><td class="num">4</td><td class="num">5</td><td class="num">6</td><td class="num">7</td><td class="num">8</td><td class="num">9</td></tr></tbody>
+  </table></div>
+  <p>精度环：金 ±5%，银 ±10%，棕 ±1%。顺口记法："黑棕红橙黄绿蓝紫灰白"按 0 ~ 9 排，中间就是彩虹顺序。</p>
+  <p><b>贴片电阻用数字码</b>（单位前缀那课学过）：</p>
+  <div class="scroll"><table>
+    <thead><tr><th>标记</th><th>读法</th><th>阻值</th></tr></thead>
+    <tbody>
+      <tr><td class="num">472</td><td>47 后面 2 个 0（±5% 电阻用三位码）</td><td class="num">4.7 kΩ</td></tr>
+      <tr><td class="num">4701</td><td>470 后面 1 个 0（±1% 电阻用四位码）</td><td class="num">4.7 kΩ</td></tr>
+      <tr><td class="num">4R7</td><td>R 是小数点</td><td class="num">4.7 Ω</td></tr>
+      <tr><td class="num">000 / 0</td><td>0 Ω 电阻，就是一根"跳线"</td><td class="num">0 Ω</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">STEP 7</span>电路板上常见的几种电阻</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>用途</th><th>典型值</th><th>干什么</th></tr></thead>
+    <tbody>
+      <tr><td>LED 限流</td><td class="num">220 Ω ~ 1 kΩ</td><td>限制 LED 电流，防止烧掉</td></tr>
+      <tr><td>上拉 / 下拉</td><td class="num">4.7 kΩ ~ 10 kΩ</td><td>让引脚在没人驱动时有确定的高 / 低电平（§20 讲）</td></tr>
+      <tr><td>分压</td><td class="num">10 kΩ ~ 100 kΩ</td><td>把高电压按比例降下来给 ADC 测（§5 讲）</td></tr>
+      <tr><td>电流采样</td><td class="num">10 mΩ ~ 0.1 Ω</td><td>上一课讲的：测它两端电压算电流</td></tr>
+      <tr><td>0 Ω 电阻</td><td class="num">0 Ω</td><td>当跳线用，或者留个位置以后可以断开</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">ANSWER</span>揭晓谜题</h2>
+  <p>数据线的两根电源线都有电阻。便宜线又长又细，2 A 电流下能在线上掉近 1 V，手机端只剩 4 V 出头。手机检测到电压太低，会降低充电电流来保护自己，于是充得慢。线上掉的那部分电压，全部变成线自己发的热。</p>
+  <p>快充线做得更粗（截面积大，R 小），或者干脆提高电压（9 V、20 V）来减小电流，都是为了减少线上的损失。这和远距离输电用高压是同一个道理。</p>
+</section>
+
+<section class="key" style="gap:10px">
+  <h2 style="font-size:1.2rem">三句话总结</h2>
+  <ol class="sum">
+    <li><b>R = ρL/A</b>：越长越细电阻越大；导线和 PCB 走线都有电阻，电流大时不能忽略</li>
+    <li>金属电阻随温度升高而变大，<b>NTC</b> 反过来变小，可以用来测温</li>
+    <li>电阻取<b>标准系列值</b>（E12 / E24 / E96）；插件看色环，贴片看数字码</li>
+  </ol>
+</section>
+<p class="lede" style="font-size:.9rem">下一课 §4.5：功率。电阻会不会烧、怎么散热、效率是什么。</p>
+</main>
+
+<script>
+(function(){
+  // E12 on a log axis, drawn to scale
+  var vals=[10,12,15,18,22,27,33,39,47,56,68,82,100];
+  var g=document.getElementById('e12'), ns='http://www.w3.org/2000/svg';
+  function x(v){return 30+540*Math.log10(v/10);}
+  vals.forEach(function(v,i){
+    var cx=x(v);
+    if(i<vals.length-1){
+      var r=document.createElementNS(ns,'rect');
+      r.setAttribute('x',x(v*0.9)); r.setAttribute('y',70);
+      r.setAttribute('width',x(v*1.1)-x(v*0.9)); r.setAttribute('height',20);
+      r.setAttribute('fill','var(--rule)'); r.setAttribute('opacity','0.8');
+      g.appendChild(r);
+    }
+    var c=document.createElementNS(ns,'circle');
+    c.setAttribute('cx',cx); c.setAttribute('cy',80); c.setAttribute('r',5);
+    c.setAttribute('fill', v===47||v===56 ? 'var(--copper)' : 'var(--mask)');
+    g.appendChild(c);
+    var t=document.createElementNS(ns,'text');
+    t.setAttribute('x',cx); t.setAttribute('y', i%2? 118:54);
+    t.setAttribute('text-anchor','middle'); t.setAttribute('font-size','14');
+    t.setAttribute('class','m'+(v===47||v===56?' cu':'')); t.textContent=v;
+    g.appendChild(t);
+  });
+
+  // cable calculator
+  var rho=1.68e-8;
+  var len=document.getElementById('len'), awg=document.getElementById('awg'), cur=document.getElementById('cur');
+  function f(n,d){return n.toFixed(d);}
+  function update(){
+    var L=+len.value, A=+awg.value*1e-6, I=+cur.value;
+    var R=rho*2*L/A, drop=Math.min(I*R,5), P=I*I*R;
+    document.getElementById('lenOut').textContent=f(L,2).replace(/0$/,'')+' m';
+    document.getElementById('curOut').textContent=f(I,1)+' A';
+    document.getElementById('rOut').textContent=f(R,3)+' Ω';
+    document.getElementById('dOut').textContent=f(drop,2)+' V';
+    document.getElementById('vOut').textContent=f(5-drop,2)+' V';
+    document.getElementById('pOut').textContent=f(P,2)+' W';
+    document.getElementById('barOk').style.width=((5-drop)/5*100)+'%';
+    document.getElementById('barDrop').style.width=(drop/5*100)+'%';
+  }
+  [len,awg,cur].forEach(function(el){el.addEventListener('input',update);});
+  update();
+})();
+</script>
