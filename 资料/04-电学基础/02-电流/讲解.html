@@ -1,0 +1,442 @@
+<title>电流 · 硬件课 §4.3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column like a lab notebook; figures sit on "board" panels; copper = current/charge, solder-mask green = circuit parts */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --fg:#1b2427; --muted:#5a676d; --rule:#d5dde0;
+  --copper:#b25f25; --copper-soft:#f4e3d6; --mask:#2c6b5a; --mask-soft:#dcebe6; --warn:#a33a2a; --warn-soft:#f6dcd7;
+  --display:"Noto Serif SC","Songti SC",serif;
+  --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111719; --surface:#182124; --fg:#e3eaec; --muted:#97a5ab; --rule:#2b373b;
+  --copper:#e3904f; --copper-soft:#3a2617; --mask:#62b79c; --mask-soft:#16302a; --warn:#ef7d6a; --warn-soft:#3b1d18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111719; --surface:#182124; --fg:#e3eaec; --muted:#97a5ab; --rule:#2b373b;
+  --copper:#e3904f; --copper-soft:#3a2617; --mask:#62b79c; --mask-soft:#16302a; --warn:#ef7d6a; --warn-soft:#3b1d18; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font:16px/1.8 var(--body);padding-inline:16px;padding-block:32px 64px}
+main{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2{font-family:var(--display);text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(2.2rem,7vw,3.2rem);font-weight:900}
+h2{font-size:1.45rem;font-weight:600;display:flex;gap:12px;align-items:baseline}
+h2 .n{font:600 .8rem var(--mono);color:var(--copper);letter-spacing:.08em;flex:none}
+p{margin:0}
+ul{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px}
+section{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:500 .8rem var(--mono);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.lede{color:var(--muted)}
+.puzzle{border-left:3px solid var(--copper);padding:4px 0 4px 16px;font-weight:500}
+.key{background:var(--mask-soft);border-radius:6px;padding:14px 18px}
+.key b{color:var(--mask)}
+.formula{font:600 1.25rem var(--mono);text-align:center;padding:6px 0}
+.formula .c{color:var(--copper)}
+.mono{font-family:var(--mono);font-size:.92em}
+figure{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+figcaption{font-size:.85rem;color:var(--muted)}
+.scroll{overflow-x:auto}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--body);fill:var(--fg)}
+svg .m{font-family:var(--mono)}
+svg .mut{fill:var(--muted)}
+svg .cu{fill:var(--copper)}
+svg .gr{fill:var(--mask)}
+svg .wr{fill:var(--warn)}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:700;color:var(--muted);font-size:.82rem;letter-spacing:.04em}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+pre{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;overflow-x:auto;font:14px/1.7 var(--mono)}
+ol.sum{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}
+.pair > div{min-width:0;display:flex;flex-direction:column;gap:6px}
+.tag{font:600 .78rem var(--mono);letter-spacing:.06em}
+.tag.ok{color:var(--mask)} .tag.bad{color:var(--warn)}
+
+/* controls */
+.ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 16px}
+.ctrl label{display:flex;flex-direction:column;gap:2px;font-size:.85rem;color:var(--muted)}
+.ctrl output{font:600 .95rem var(--mono);color:var(--fg)}
+.ctrl input[type=range],.ctrl select{width:100%;font:inherit;color:var(--fg)}
+.ctrl select{background:var(--bg);border:1px solid var(--rule);border-radius:4px;padding:6px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.readout div{border-top:2px solid var(--rule);padding-top:6px;display:flex;flex-direction:column}
+.readout span{font-size:.8rem;color:var(--muted)}
+.readout strong{font:600 1.35rem var(--mono);font-variant-numeric:tabular-nums}
+.readout .hot strong{color:var(--copper)}
+.share{height:16px;border-radius:3px;overflow:hidden;display:flex;background:var(--rule)}
+.share i{display:block;background:var(--copper)}
+.share b{display:block;background:var(--mask)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:.82rem;color:var(--muted)}
+.legend span::before{content:"";display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:-1px;background:var(--c)}
+.calcline{font:14px/1.7 var(--mono);color:var(--muted);overflow-x:auto;white-space:nowrap}
+.calcline b{color:var(--fg)}
+canvas{display:block;width:100%;height:120px;border-radius:6px;background:var(--bg)}
+button{font:500 .85rem var(--body);color:var(--fg);background:var(--bg);border:1px solid var(--rule);border-radius:4px;padding:5px 12px;cursor:pointer}
+button:hover{border-color:var(--copper)}
+:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+</style>
+
+<main>
+<header style="display:flex;flex-direction:column;gap:10px">
+  <span class="eyebrow">第二阶段 电学基础 · §4.3</span>
+  <h1>电流</h1>
+  <p class="lede">电流是"每秒流过多少电荷"。这一课用几个动手调的图把它讲透，最后落到最实用的一件事：电池能用多久。</p>
+  <p class="puzzle">开场谜题：一颗纽扣电池 CR2032，容量 220 mAh。装进温湿度传感器，有的产品一天就没电，有的能撑一年多。差别在哪？</p>
+</header>
+
+<section>
+  <h2><span class="n">STEP 1</span>电流 = 每秒流过多少电荷</h2>
+  <p>想象站在导线中间的一个"检查站"，数每秒有多少电荷从面前经过。数出来的就是电流。</p>
+  <figure>
+    <canvas id="flow" aria-label="电荷沿导线流过检查站的动画"></canvas>
+    <div class="ctrl">
+      <label for="iSlider">调电流大小 <output id="iOut">0.5 A</output><input id="iSlider" type="range" min="0.1" max="2" step="0.1" value="0.5"></label>
+      <div style="display:flex;align-items:flex-end;gap:8px"><button id="resetBtn" type="button">重新计数</button></div>
+    </div>
+    <div class="readout">
+      <div><span>经过时间 t</span><strong id="tOut">0.0 s</strong></div>
+      <div class="hot"><span>已通过电荷 Q</span><strong id="qOut">0.0 C</strong></div>
+      <div><span>Q ÷ t</span><strong id="qtOut">–</strong></div>
+    </div>
+    <figcaption>每个小圆点代表 0.1 C 电荷（示意，按约定方向往右画）。电流越大，点走得越快，每秒过检查站的点越多。不管计数多久，Q ÷ t 总是等于你设的电流。</figcaption>
+  </figure>
+  <div class="formula">I = Q ÷ t　　1 A = 每秒 1 C</div>
+  <p>路线里还写了 <span class="mono">I = dQ/dt</span>。它和 Q ÷ t 的区别，就像汽车的<b>平均速度</b>和<b>速度表上的瞬时速度</b>：</p>
+  <div class="scroll"><table>
+    <thead><tr><th>开车</th><th>电路</th></tr></thead>
+    <tbody>
+      <tr><td>走过的路程</td><td>流过的电荷量 Q</td></tr>
+      <tr><td>平均速度 = 路程 ÷ 时间</td><td>平均电流 = Q ÷ t</td></tr>
+      <tr><td>速度表上此刻的读数</td><td>此刻的电流 dQ/dt</td></tr>
+    </tbody>
+  </table></div>
+  <p>电流一直不变时，两者一样。电流忽大忽小时（比如设备一会儿干活一会儿睡觉），就要分清"此刻多少"和"平均多少"。第 5 步算电池寿命，用的就是平均电流。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 2</span>电流往哪边流</h2>
+  <figure>
+    <div class="scroll"><svg viewBox="0 0 640 260" role="img" aria-label="约定电流从正极出发经灯泡回负极，电子方向相反">
+      <defs>
+        <marker id="aCu" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--copper)"/></marker>
+        <marker id="aMu" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker>
+      </defs>
+      <rect x="120" y="50" width="400" height="160" fill="none" stroke="var(--rule)" stroke-width="4"/>
+      <!-- battery on left -->
+      <rect x="104" y="100" width="32" height="60" fill="var(--bg)"/>
+      <line x1="96" y1="112" x2="144" y2="112" stroke="var(--fg)" stroke-width="4"/>
+      <line x1="106" y1="128" x2="134" y2="128" stroke="var(--fg)" stroke-width="4"/>
+      <line x1="96" y1="144" x2="144" y2="144" stroke="var(--fg)" stroke-width="4"/>
+      <text x="80" y="104" font-size="16" class="m cu" font-weight="600" text-anchor="middle">+</text>
+      <text x="80" y="170" font-size="16" class="m" font-weight="600" text-anchor="middle">−</text>
+      <text x="60" y="136" font-size="13" class="mut" text-anchor="middle">电池</text>
+      <!-- bulb on right -->
+      <circle cx="520" cy="130" r="22" fill="var(--surface)" stroke="var(--fg)" stroke-width="3"/>
+      <line x1="505" y1="115" x2="535" y2="145" stroke="var(--fg)" stroke-width="2"/>
+      <line x1="535" y1="115" x2="505" y2="145" stroke="var(--fg)" stroke-width="2"/>
+      <text x="575" y="135" font-size="13" class="mut">灯泡</text>
+      <!-- conventional current: + (top-left) -> right -> down -> back -->
+      <line x1="170" y1="38" x2="470" y2="38" stroke="var(--copper)" stroke-width="2.5" marker-end="url(#aCu)"/>
+      <text x="320" y="28" font-size="14" class="cu" text-anchor="middle" font-weight="700">约定电流：正极 → 外电路 → 负极</text>
+      <line x1="470" y1="222" x2="170" y2="222" stroke="var(--copper)" stroke-width="2.5" marker-end="url(#aCu)"/>
+      <!-- electrons opposite, inside -->
+      <line x1="440" y1="72" x2="200" y2="72" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#aMu)"/>
+      <line x1="200" y1="188" x2="440" y2="188" stroke="var(--muted)" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#aMu)"/>
+      <text x="320" y="135" font-size="14" class="mut" text-anchor="middle">虚线：电子实际在往反方向挪</text>
+      <text x="320" y="252" font-size="13" class="mut" text-anchor="middle">两个方向说的是同一件事，只是视角相反</text>
+    </svg></div>
+    <figcaption>铜色实线是画图、计算时用的方向；灰色虚线是电子真实的运动方向。</figcaption>
+  </figure>
+  <p>为什么反着？1740 年代富兰克林给电荷起"正""负"的名字时，还没发现电子，猜错了谁在动。后来发现导线里动的是带<b>负电</b>的电子，但这套约定已经用了一百多年，就一直沿用下来。</p>
+  <div class="key"><b>做电路一律用约定方向。</b>电路图里二极管、三极管符号上的箭头，指的都是约定方向。算的时候方向全反过来，答案也一样，所以知道这件事就够了。</div>
+</section>
+
+<section>
+  <h2><span class="n">STEP 3</span>电流不会被"用掉"</h2>
+  <p>常见误解：电流从正极出来，经过灯泡被"吃掉"一些，回到负极的就少了。在灯泡前后各串一个电流表看看：</p>
+  <figure>
+    <div class="scroll"><svg viewBox="0 0 640 230" role="img" aria-label="灯泡前后电流相同，都是0.2安，但电压从3伏降到0伏">
+      <rect x="70" y="60" width="500" height="130" fill="none" stroke="var(--rule)" stroke-width="4"/>
+      <!-- battery -->
+      <rect x="54" y="100" width="32" height="50" fill="var(--bg)"/>
+      <line x1="46" y1="112" x2="94" y2="112" stroke="var(--fg)" stroke-width="4"/>
+      <line x1="56" y1="132" x2="84" y2="132" stroke="var(--fg)" stroke-width="4"/>
+      <text x="30" y="116" class="m cu" font-size="15" font-weight="600">+</text>
+      <text x="30" y="140" class="m" font-size="15" font-weight="600">−</text>
+      <!-- ammeter A1 -->
+      <circle cx="200" cy="60" r="24" fill="var(--surface)" stroke="var(--mask)" stroke-width="3"/>
+      <text x="200" y="66" text-anchor="middle" class="m gr" font-size="16" font-weight="600">A</text>
+      <text x="200" y="24" text-anchor="middle" class="m" font-size="15" font-weight="600">0.2 A</text>
+      <!-- bulb -->
+      <circle cx="320" cy="60" r="20" fill="var(--copper-soft)" stroke="var(--copper)" stroke-width="3"/>
+      <line x1="306" y1="46" x2="334" y2="74" stroke="var(--copper)" stroke-width="2"/>
+      <line x1="334" y1="46" x2="306" y2="74" stroke="var(--copper)" stroke-width="2"/>
+      <text x="320" y="24" text-anchor="middle" font-size="14">灯泡</text>
+      <!-- ammeter A2 -->
+      <circle cx="440" cy="60" r="24" fill="var(--surface)" stroke="var(--mask)" stroke-width="3"/>
+      <text x="440" y="66" text-anchor="middle" class="m gr" font-size="16" font-weight="600">A</text>
+      <text x="440" y="24" text-anchor="middle" class="m" font-size="15" font-weight="600">0.2 A</text>
+      <!-- potentials -->
+      <text x="200" y="112" text-anchor="middle" class="m cu" font-size="14">这里 3 V 高</text>
+      <text x="440" y="112" text-anchor="middle" class="m mut" font-size="14">这里 0 V 低</text>
+      <text x="320" y="160" text-anchor="middle" font-size="15">电荷<tspan font-weight="700">一个没少</tspan>，少的是<tspan class="cu" font-weight="700">电势（高度）</tspan></text>
+      <text x="320" y="218" text-anchor="middle" class="mut" font-size="13">电荷"从 3 V 掉到 0 V"时放出的能量，变成了光和热</text>
+    </svg></div>
+    <figcaption>灯泡前后电流一样大。被用掉的是能量，不是电荷。</figcaption>
+  </figure>
+  <p>水车比喻：水从高处冲下来推动水车，流出去的水一滴没少，少的是水的<b>高度</b>。电荷就是水，电压就是高度差，灯泡就是水车。</p>
+  <p>这也是为什么<b>串联电路里电流处处相等</b>：同一条路上，进来多少就出去多少，中间没有地方能把电荷吞掉或者变出来。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 4</span>硬件里的电流有多大</h2>
+  <p>智能硬件里的电流跨度极大，从几 µA 到几 A，差了一百万倍。所以下面用对数刻度画，每一格是 10 倍：</p>
+  <figure>
+    <div class="scroll"><svg viewBox="0 0 640 200" role="img" aria-label="常见电流量级的对数刻度图">
+      <rect x="384" y="70" width="216" height="40" fill="var(--warn-soft)"/>
+      <line x1="40" y1="90" x2="600" y2="90" stroke="var(--fg)" stroke-width="2"/>
+      <g id="ticks"></g>
+      <g id="marks"></g>
+    </svg></div>
+    <figcaption>一个 GPIO 引脚只能提供 20 mA 左右，右边浅红色区域里的东西都不能直接接在引脚上，要用三极管 / MOSFET 来驱动（§20、§22 讲）。</figcaption>
+  </figure>
+</section>
+
+<section>
+  <h2><span class="n">STEP 5</span>电池能用多久</h2>
+  <p>电池容量的单位 <b>mAh</b> 本身就是一个电荷量：<span class="mono">1 mAh</span> = 1 mA 的电流持续 1 小时。把电池想成一桶水，容量是桶有多大，电流是每小时漏出去多少：</p>
+  <div class="formula">能用多久 = 容量 ÷ <span class="c">平均电流</span></div>
+  <p>大多数智能硬件不会一直全速运行，而是<b>醒来 → 干活 → 睡觉</b>，周而复始。下面画的是一个周期里电流随时间的变化，自己调调看：</p>
+  <figure>
+    <div class="scroll"><svg id="duty" viewBox="0 0 640 190" role="img" aria-label="一个周期内电流随时间变化"></svg></div>
+    <div class="ctrl">
+      <label for="period">每隔多久醒一次 <output id="periodOut"></output><input id="period" type="range" min="0" max="7" step="1" value="2"></label>
+      <label for="awake">每次醒多久 <output id="awakeOut"></output><input id="awake" type="range" min="0.1" max="5" step="0.1" value="1"></label>
+      <label for="iWake">醒着时电流 <output id="iWakeOut"></output><input id="iWake" type="range" min="1" max="50" step="1" value="10"></label>
+      <label for="iSleep">睡着时电流 <output id="iSleepOut"></output><input id="iSleep" type="range" min="1" max="200" step="1" value="10"></label>
+      <label for="bat">电池
+        <select id="bat">
+          <option value="220" selected>CR2032 纽扣电池 · 220 mAh</option>
+          <option value="1000">AAA 电池 · 约 1000 mAh</option>
+          <option value="2500">18650 锂电池 · 约 2500 mAh</option>
+        </select></label>
+    </div>
+    <div class="calcline" id="calcLine"></div>
+    <div class="readout">
+      <div class="hot"><span>平均电流</span><strong id="avgOut">–</strong></div>
+      <div><span>理论续航</span><strong id="lifeOut">–</strong></div>
+      <div><span>按 8 折估算</span><strong id="life8Out">–</strong></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:6px">
+      <div class="share" aria-hidden="true"><i id="shWake"></i><b id="shSleep"></b></div>
+      <div class="legend"><span style="--c:var(--copper)" id="lgWake">醒着耗的电</span><span style="--c:var(--mask)" id="lgSleep">睡着耗的电</span></div>
+    </div>
+    <figcaption>注意图里睡眠电流几乎是一条贴着底的线，它比醒着时小上千倍。实际电池在大电流和低温下放不出标称容量，估算时打个 8 折更稳妥。</figcaption>
+  </figure>
+  <div class="key"><b>调完会发现：</b>大多数时候耗电大头是<b>醒着的那一小会儿</b>。想更省电，最有效的是醒得更少、醒着时干完活赶紧睡。只有醒得非常少的时候，睡眠电流才变成主角，这时就要挑睡眠电流低的芯片。</div>
+</section>
+
+<section>
+  <h2><span class="n">STEP 6</span>怎么测电流</h2>
+  <p>电流是"流过"的量，所以电流表必须让电流<b>从它肚子里穿过去</b>；电压是"两点之差"，电压表只要<b>点在两点上</b>。</p>
+  <div class="pair">
+    <div>
+      <span class="tag ok">✓ 电流表：断开电路，串进去</span>
+      <svg viewBox="0 0 300 170" role="img" aria-label="电流表串联在电路中">
+        <rect x="40" y="40" width="220" height="100" fill="none" stroke="var(--rule)" stroke-width="3"/>
+        <rect x="26" y="70" width="28" height="40" fill="var(--surface)"/>
+        <line x1="20" y1="80" x2="60" y2="80" stroke="var(--fg)" stroke-width="3"/>
+        <line x1="28" y1="96" x2="52" y2="96" stroke="var(--fg)" stroke-width="3"/>
+        <circle cx="150" cy="40" r="18" fill="var(--surface)" stroke="var(--mask)" stroke-width="3"/>
+        <text x="150" y="46" text-anchor="middle" class="m gr" font-size="15" font-weight="600">A</text>
+        <rect x="245" y="70" width="30" height="40" fill="var(--copper-soft)" stroke="var(--copper)" stroke-width="2"/>
+        <text x="150" y="165" text-anchor="middle" class="mut" font-size="12">电流必须穿过电流表</text>
+      </svg>
+    </div>
+    <div>
+      <span class="tag ok">✓ 电压表：并在两点上</span>
+      <svg viewBox="0 0 300 170" role="img" aria-label="电压表并联在负载两端">
+        <rect x="40" y="40" width="220" height="100" fill="none" stroke="var(--rule)" stroke-width="3"/>
+        <rect x="26" y="70" width="28" height="40" fill="var(--surface)"/>
+        <line x1="20" y1="80" x2="60" y2="80" stroke="var(--fg)" stroke-width="3"/>
+        <line x1="28" y1="96" x2="52" y2="96" stroke="var(--fg)" stroke-width="3"/>
+        <rect x="245" y="70" width="30" height="40" fill="var(--copper-soft)" stroke="var(--copper)" stroke-width="2"/>
+        <path d="M260 55 H200 V72" fill="none" stroke="var(--mask)" stroke-width="2"/>
+        <path d="M260 125 H200 V108" fill="none" stroke="var(--mask)" stroke-width="2"/>
+        <circle cx="200" cy="90" r="18" fill="var(--surface)" stroke="var(--mask)" stroke-width="3"/>
+        <text x="200" y="96" text-anchor="middle" class="m gr" font-size="15" font-weight="600">V</text>
+        <text x="150" y="165" text-anchor="middle" class="mut" font-size="12">不用断开电路</text>
+      </svg>
+    </div>
+  </div>
+  <div class="pair">
+    <div>
+      <span class="tag bad">✗ 千万别：电流表直接并在电源上</span>
+      <svg viewBox="0 0 300 150" role="img" aria-label="电流表并在电源两端会短路">
+        <rect x="26" y="50" width="28" height="40" fill="var(--surface)"/>
+        <line x1="20" y1="60" x2="60" y2="60" stroke="var(--fg)" stroke-width="3"/>
+        <line x1="28" y1="76" x2="52" y2="76" stroke="var(--fg)" stroke-width="3"/>
+        <path d="M40 60 V20 H160 V52" fill="none" stroke="var(--warn)" stroke-width="3"/>
+        <path d="M40 76 V120 H160 V88" fill="none" stroke="var(--warn)" stroke-width="3"/>
+        <circle cx="160" cy="70" r="18" fill="var(--surface)" stroke="var(--warn)" stroke-width="3"/>
+        <text x="160" y="76" text-anchor="middle" class="m wr" font-size="15" font-weight="600">A</text>
+        <text x="200" y="66" class="wr" font-size="13" font-weight="700">短路！</text>
+        <text x="200" y="86" class="mut" font-size="12">表内阻接近 0</text>
+      </svg>
+    </div>
+    <div>
+      <span class="tag ok">✓ 板子上常用：采样电阻</span>
+      <p style="font-size:.93rem">在电路里串一个很小的电阻（比如 0.1 Ω），量它两端的电压，再用 <span class="mono">I = V ÷ R</span> 算电流。量到 0.05 V，电流就是 0.05 ÷ 0.1 = 0.5 A。INA219 这类电流检测芯片就是这么做的。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2><span class="n">STEP 7</span>数据手册里的电流参数</h2>
+  <div class="scroll"><table>
+    <thead><tr><th>写法</th><th>意思</th></tr></thead>
+    <tbody>
+      <tr><td class="num">I_DD / I_CC</td><td>芯片正常工作时从电源取的电流</td></tr>
+      <tr><td class="num">I_Q</td><td>静态电流：芯片空闲时自己耗的电，选电源芯片必看</td></tr>
+      <tr><td class="num">Sleep current</td><td>睡眠电流：电池设备最关键的指标之一</td></tr>
+      <tr><td class="num">I_OH / I_OL</td><td>GPIO 输出高 / 低电平时能提供多大电流</td></tr>
+      <tr><td class="num">Absolute max</td><td>绝对最大值：超过就可能损坏，设计时要离它远远的</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section>
+  <h2><span class="n">ANSWER</span>揭晓谜题</h2>
+  <p>220 mAh 能用多久，取决于<b>平均电流</b>：</p>
+  <ul>
+    <li>一直开着，平均 10 mA：220 ÷ 10 = 22 小时，<b>一天就没电</b></li>
+    <li>大部分时间深度睡眠，平均 20 µA：220 ÷ 0.02 = 11000 小时，<b>一年多</b></li>
+  </ul>
+  <p>同一颗电池，差了 500 倍。电池设备的功耗设计，核心就是<b>让它尽量睡觉</b>。在第 5 步的图里把"每隔多久醒一次"拉到最长，就能看到这个效果。</p>
+</section>
+
+<section class="key" style="gap:10px">
+  <h2 style="font-size:1.2rem">三句话总结</h2>
+  <ol class="sum">
+    <li><b>电流 = 每秒流过的电荷</b>，I = Q ÷ t；dQ/dt 是"此刻"的电流，像速度表读数</li>
+    <li>电流走闭合回路，<b>不会被用掉</b>，被用掉的是能量（电势降低）</li>
+    <li><b>续航 = 容量 ÷ 平均电流</b>；省电的关键是少醒、醒着快干完，再加上低睡眠电流</li>
+  </ol>
+</section>
+<p class="lede" style="font-size:.9rem">下一课 §4.4：电阻。</p>
+</main>
+
+<script>
+(function(){
+  var ns='http://www.w3.org/2000/svg';
+  function el(tag,attrs,text){var e=document.createElementNS(ns,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);if(text!=null)e.textContent=text;return e;}
+  var reduce=window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- STEP 1: flow animation ---------- */
+  var cv=document.getElementById('flow'),ctx=cv.getContext('2d');
+  var slider=document.getElementById('iSlider');
+  var SPACING=34, Q_PER_DOT=0.1;
+  var offset=0, t=0, q=0, last=null, colors={}, frame=0;
+  function readColors(){var s=getComputedStyle(document.documentElement);
+    ['--copper','--rule','--fg','--muted','--surface','--mask'].forEach(function(k){colors[k]=s.getPropertyValue(k).trim();});}
+  function size(){var r=cv.getBoundingClientRect(),d=window.devicePixelRatio||1;cv.width=Math.round(r.width*d);cv.height=Math.round(r.height*d);ctx.setTransform(d,0,0,d,0,0);}
+  function draw(){
+    var w=cv.getBoundingClientRect().width,h=120,mid=w/2;
+    ctx.clearRect(0,0,w,h);
+    ctx.fillStyle=colors['--rule'];ctx.fillRect(0,40,w,40);
+    ctx.fillStyle=colors['--copper'];
+    for(var x=(offset%SPACING)-SPACING;x<w+SPACING;x+=SPACING){ctx.beginPath();ctx.arc(x,60,7,0,Math.PI*2);ctx.fill();}
+    ctx.strokeStyle=colors['--mask'];ctx.lineWidth=3;ctx.setLineDash([6,5]);
+    ctx.beginPath();ctx.moveTo(mid,22);ctx.lineTo(mid,98);ctx.stroke();ctx.setLineDash([]);
+    ctx.fillStyle=colors['--mask'];ctx.font='600 13px '+getComputedStyle(document.body).fontFamily;ctx.textAlign='center';
+    ctx.fillText('检查站',mid,16);
+    ctx.fillStyle=colors['--muted'];ctx.fillText('导线 →',w-40,112);
+  }
+  function step(ts){
+    if(frame++%30===0)readColors();
+    var I=+slider.value;
+    if(last!=null){var dt=Math.min((ts-last)/1000,0.1);
+      offset+=I/Q_PER_DOT*SPACING*dt; t+=dt; q+=I*dt;}
+    last=ts; draw(); show();
+    requestAnimationFrame(step);
+  }
+  function show(){
+    var I=+slider.value;
+    document.getElementById('iOut').textContent=I.toFixed(1)+' A（每秒过 '+Math.round(I/Q_PER_DOT)+' 个点）';
+    document.getElementById('tOut').textContent=t.toFixed(1)+' s';
+    document.getElementById('qOut').textContent=q.toFixed(1)+' C';
+    document.getElementById('qtOut').textContent=t>0.2?(q/t).toFixed(2)+' A':'–';
+  }
+  function reset(){t=0;q=0;show();}
+  slider.addEventListener('input',reset);
+  document.getElementById('resetBtn').addEventListener('click',reset);
+  readColors();size();window.addEventListener('resize',function(){size();draw();});
+  if(reduce){t=10;q=+slider.value*10;draw();show();
+    slider.addEventListener('input',function(){t=10;q=+slider.value*10;draw();show();});
+  } else requestAnimationFrame(step);
+
+  /* ---------- STEP 4: log scale of currents ---------- */
+  function lx(a){return 40+80*(Math.log10(a)+6);}
+  var tk=document.getElementById('ticks');
+  [[1e-6,'1µA'],[1e-5,'10µA'],[1e-4,'100µA'],[1e-3,'1mA'],[1e-2,'10mA'],[1e-1,'100mA'],[1,'1A'],[10,'10A']].forEach(function(p){
+    var x=lx(p[0]);tk.appendChild(el('line',{x1:x,y1:84,x2:x,y2:96,stroke:'var(--fg)','stroke-width':2}));
+    tk.appendChild(el('text',{x:x,y:192,'text-anchor':'middle','font-size':12,'class':'m mut'},p[1]));
+  });
+  var mk=document.getElementById('marks');
+  [[5e-6,'深度睡眠','5 µA',1],[1e-4,'传感器待机','100 µA',0],[1e-2,'LED','10 mA',1],[2e-2,'GPIO 上限','20 mA',0],[0.3,'Wi-Fi 发射','300 mA',1],[1,'小电机','1 A',0],[3,'快充','3 A',1]].forEach(function(m){
+    var x=lx(m[0]),up=m[3]===1,warn=m[0]>2e-2;
+    mk.appendChild(el('circle',{cx:x,cy:90,r:6,fill:warn?'var(--warn)':(m[0]===2e-2?'var(--copper)':'var(--mask)')}));
+    var y1=up?40:130;
+    mk.appendChild(el('line',{x1:x,y1:up?50:110,x2:x,y2:up?82:98,stroke:'var(--muted)','stroke-width':1}));
+    mk.appendChild(el('text',{x:x,y:up?28:126,'text-anchor':'middle','font-size':13,'font-weight':700},m[1]));
+    mk.appendChild(el('text',{x:x,y:up?44:142,'text-anchor':'middle','font-size':12,'class':'m mut'},m[2]));
+  });
+
+  /* ---------- STEP 5: duty-cycle battery life ---------- */
+  var periods=[10,30,60,120,300,600,1800,3600];
+  var pE=document.getElementById('period'),aE=document.getElementById('awake'),wE=document.getElementById('iWake'),sE=document.getElementById('iSleep'),bE=document.getElementById('bat');
+  var svg=document.getElementById('duty');
+  function fmtT(s){return s<60?s+' 秒':(s<3600?(s/60)+' 分钟':(s/3600)+' 小时');}
+  function fmtI(mA){return mA>=1?mA.toFixed(2)+' mA':(mA*1000).toFixed(1)+' µA';}
+  function fmtLife(h){if(h<48)return h.toFixed(0)+' 小时';var d=h/24;if(d<365)return d.toFixed(0)+' 天';return (d/365).toFixed(1)+' 年';}
+  function upd(){
+    var P=periods[+pE.value],A=Math.min(+aE.value,P),Iw=+wE.value,Is=+sE.value/1000,cap=+bE.value;
+    var qW=Iw*A,qS=Is*(P-A),avg=(qW+qS)/P,life=cap/avg;
+    document.getElementById('periodOut').textContent=fmtT(P);
+    document.getElementById('awakeOut').textContent=A.toFixed(1)+' 秒';
+    document.getElementById('iWakeOut').textContent=Iw+' mA';
+    document.getElementById('iSleepOut').textContent=(+sE.value)+' µA';
+    document.getElementById('avgOut').textContent=fmtI(avg);
+    document.getElementById('lifeOut').textContent=fmtLife(life);
+    document.getElementById('life8Out').textContent=fmtLife(life*0.8);
+    document.getElementById('calcLine').innerHTML='平均电流 = (<b>'+Iw+' mA × '+A.toFixed(1)+' s</b> + '+(+sE.value/1000)+' mA × '+(P-A).toFixed(1)+' s) ÷ '+P+' s = <b>'+fmtI(avg)+'</b>';
+    var share=qW/(qW+qS)*100;
+    document.getElementById('shWake').style.width=share+'%';
+    document.getElementById('shSleep').style.width=(100-share)+'%';
+    document.getElementById('lgWake').textContent='醒着耗的电 '+share.toFixed(0)+'%';
+    document.getElementById('lgSleep').textContent='睡着耗的电 '+(100-share).toFixed(0)+'%';
+    // timeline
+    while(svg.firstChild)svg.removeChild(svg.firstChild);
+    var X0=60,X1=620,Y0=150,Y1=30,maxI=50;
+    function yI(i){return Y0-(Y0-Y1)*i/maxI;}
+    [0,25,50].forEach(function(v){
+      svg.appendChild(el('line',{x1:X0,y1:yI(v),x2:X1,y2:yI(v),stroke:'var(--rule)','stroke-width':1}));
+      svg.appendChild(el('text',{x:X0-8,y:yI(v)+4,'text-anchor':'end','font-size':12,'class':'m mut'},v+' mA'));
+    });
+    var aw=Math.max((X1-X0)*A/P,2);
+    svg.appendChild(el('rect',{x:X0,y:yI(Iw),width:aw,height:Y0-yI(Iw),fill:'var(--copper)'}));
+    svg.appendChild(el('rect',{x:X0+aw,y:yI(Is)-1.5,width:X1-X0-aw,height:Math.max(Y0-yI(Is),0)+1.5,fill:'var(--mask)'}));
+    svg.appendChild(el('line',{x1:X0,y1:Y0,x2:X1,y2:Y0,stroke:'var(--fg)','stroke-width':1.5}));
+    svg.appendChild(el('text',{x:X0+aw+6,y:Math.min(yI(Iw)+14,122),'font-size':12,'class':'cu'},'醒着 '+Iw+' mA，'+A.toFixed(1)+' 秒'));
+    svg.appendChild(el('text',{x:X1,y:Y0-10,'text-anchor':'end','font-size':12,'class':'gr'},'睡着 '+(+sE.value)+' µA（几乎贴着底线）'));
+    svg.appendChild(el('text',{x:X0,y:176,'font-size':12,'class':'m mut'},'0'));
+    svg.appendChild(el('text',{x:X1,y:176,'text-anchor':'end','font-size':12,'class':'m mut'},fmtT(P)+'（一个周期）'));
+  }
+  [pE,aE,wE,sE,bE].forEach(function(e){e.addEventListener('input',upd);});
+  upd();
+})();
+</script>
