@@ -1,0 +1,265 @@
+<title>功率 · 硬件课 §4.5</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@600;900&family=Noto+Sans+SC:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: one reading column like a lab notebook; figures sit on "board" panels; copper = heat/loss, solder-mask green = useful power */
+:root{
+  --bg:#f3f6f6; --surface:#ffffff; --fg:#1b2427; --muted:#5a676d; --rule:#d5dde0;
+  --copper:#b25f25; --copper-soft:#f4e3d6; --mask:#2c6b5a; --mask-soft:#dcebe6; --warn:#a33a2a; --warn-soft:#f6dcd7;
+  --display:"Noto Serif SC","Songti SC",serif;
+  --body:"Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#111719; --surface:#182124; --fg:#e3eaec; --muted:#97a5ab; --rule:#2b373b;
+  --copper:#e3904f; --copper-soft:#3a2617; --mask:#62b79c; --mask-soft:#16302a; --warn:#ef7d6a; --warn-soft:#3b1d18; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#111719; --surface:#182124; --fg:#e3eaec; --muted:#97a5ab; --rule:#2b373b;
+  --copper:#e3904f; --copper-soft:#3a2617; --mask:#62b79c; --mask-soft:#16302a; --warn:#ef7d6a; --warn-soft:#3b1d18; color-scheme:dark}
+
+body{background:var(--bg);color:var(--fg);font:16px/1.8 var(--body);padding-inline:16px;padding-block:32px 64px}
+main{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:28px}
+h1,h2{font-family:var(--display);text-wrap:balance;line-height:1.3;margin:0}
+h1{font-size:clamp(2.2rem,7vw,3.2rem);font-weight:900}
+h2{font-size:1.45rem;font-weight:600;display:flex;gap:12px;align-items:baseline}
+h2 .n{font:600 .8rem var(--mono);color:var(--copper);letter-spacing:.08em;flex:none}
+p{margin:0}
+ul{margin:0;padding-left:1.3em;display:flex;flex-direction:column;gap:4px}
+section{display:flex;flex-direction:column;gap:14px}
+.eyebrow{font:500 .8rem var(--mono);letter-spacing:.12em;color:var(--muted);text-transform:uppercase}
+.lede{color:var(--muted)}
+.puzzle{border-left:3px solid var(--copper);padding:4px 0 4px 16px;font-weight:500}
+.key{background:var(--mask-soft);border-radius:6px;padding:14px 18px}
+.key b{color:var(--mask)}
+.mono{font-family:var(--mono);font-size:.92em}
+figure{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:8px;padding:16px;display:flex;flex-direction:column;gap:12px;min-width:0}
+figcaption{font-size:.85rem;color:var(--muted)}
+.scroll{overflow-x:auto}
+svg{display:block;width:100%;height:auto}
+svg text{font-family:var(--body);fill:var(--fg)}
+svg .m{font-family:var(--mono)}
+svg .mut{fill:var(--muted)}
+svg .cu{fill:var(--copper)}
+svg .gr{fill:var(--mask)}
+table{border-collapse:collapse;width:100%;font-size:.93rem}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font-weight:700;color:var(--muted);font-size:.82rem;letter-spacing:.04em}
+td.num{font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hl td{background:var(--copper-soft)}
+pre{margin:0;background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;overflow-x:auto;font:14px/1.7 var(--mono)}
+ol.sum{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:6px}
+
+.formulas{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}
+.formulas div{background:var(--surface);border:1px solid var(--rule);border-radius:6px;padding:12px 14px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.formulas strong{font:600 1.3rem var(--mono);color:var(--copper)}
+.formulas span{font-size:.88rem;color:var(--muted)}
+
+.ctrl{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px 16px}
+.ctrl label{display:flex;flex-direction:column;gap:2px;font-size:.85rem;color:var(--muted)}
+.ctrl output{font:600 .95rem var(--mono);color:var(--fg)}
+.ctrl input[type=range],.ctrl select{width:100%;font:inherit;color:var(--fg)}
+.ctrl select{background:var(--bg);border:1px solid var(--rule);border-radius:4px;padding:6px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px}
+.readout div{border-top:2px solid var(--rule);padding-top:6px;display:flex;flex-direction:column}
+.readout span{font-size:.8rem;color:var(--muted)}
+.readout strong{font:600 1.3rem var(--mono);font-variant-numeric:tabular-nums}
+.readout .hot strong{color:var(--copper)}
+.calcline{font:14px/1.7 var(--mono);color:var(--muted);overflow-x:auto;white-space:nowrap}
+.calcline b{color:var(--fg)}
+.verdict{border-radius:6px;padding:10px 14px;font-weight:500}
+.verdict.ok{background:var(--mask-soft)}
+.verdict.bad{background:var(--warn-soft);color:var(--fg)}
+.verdict b{font-family:var(--mono)}
+:focus-visible{outline:2px solid var(--copper);outline-offset:2px}
+</style>
+
+<main>
+<header style="display:flex;flex-direction:column;gap:10px">
+  <span class="eyebrow">第二阶段 电学基础 · §4.5</span>
+  <h1>功率</h1>
+  <p class="lede">初中学过 P = VI。做板子时功率关心的是另一件事：消耗掉的电能几乎都变成热，元件扛不扛得住这份热。</p>
+  <p class="puzzle">开场谜题：12V 电源点一颗红色 LED，按公式算出限流电阻 510Ω，焊了一颗最常用的 0603 贴片电阻。LED 亮了，可几秒后电阻开始发烫、变色。阻值明明算对了，为什么还会烧？</p>
+</header>
+
+<section>
+  <h2><span class="n">STEP 1</span>三个公式，其实是一个</h2>
+  <p>P = VI 是根。把欧姆定律 V = IR 代进去，就得到另外两个（公式变形那课的老本行）：</p>
+  <div class="formulas">
+    <div><strong>P = V × I</strong><span>知道电压和电流时用。算整个设备、电源的功率</span></div>
+    <div><strong>P = I² × R</strong><span>知道电流和电阻时用。串联电路、导线发热</span></div>
+    <div><strong>P = V² ÷ R</strong><span>知道电阻两端电压时用。电阻接在固定电压上</span></div>
+  </div>
+  <pre>P = V × I，把 V = I × R 代进去 → P = I × R × I = I²R
+P = V × I，把 I = V ÷ R 代进去 → P = V × V ÷ R = V²/R</pre>
+  <p>三个公式算出来结果一样，只是看手上有哪两个已知量。<b>I²</b> 和 <b>V²</b> 是平方，值得留意：电流翻倍，电阻发热变成 <b>4 倍</b>。上一课的数据线压降计算器里，电流从 1A 拉到 2A，线上发热会翻 4 倍，就是这个原因。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 2</span>电阻消耗的功率，全部变成热</h2>
+  <p>电机把电能变成转动，LED 把一部分变成光，<b>电阻只会把电能变成热</b>。所以电阻上算出来的功率，就是它每秒发出的热量。</p>
+  <p>热量多了，元件温度升高。超过它能承受的温度，就会变色、阻值漂移，最后烧断。所以每颗电阻都有一个<b>额定功率</b>：长期能安全承受的最大功率。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 3</span>额定功率看封装大小</h2>
+  <p>贴片电阻的封装用四位数字表示尺寸（英制，单位是 0.01 英寸）：0603 就是 0.06 × 0.03 英寸，约 1.6 × 0.8 mm。<b>个头越大，散热面积越大，额定功率越高。</b>下面按真实比例画：</p>
+  <figure>
+    <div class="scroll"><svg id="pkg" viewBox="0 0 640 210" role="img" aria-label="贴片电阻各封装按比例的尺寸和额定功率"></svg></div>
+    <figcaption>按实际尺寸等比例放大（1 mm = 25 像素）。两端的灰色是焊接用的金属电极。</figcaption>
+  </figure>
+  <div class="scroll"><table>
+    <thead><tr><th>封装</th><th>尺寸（mm）</th><th>常见额定功率</th><th>用在哪</th></tr></thead>
+    <tbody>
+      <tr><td class="num">0402</td><td class="num">1.0 × 0.5</td><td class="num">1/16 W · 62.5 mW</td><td>手机、空间紧张的板子</td></tr>
+      <tr><td class="num">0603</td><td class="num">1.6 × 0.8</td><td class="num">1/10 W · 100 mW</td><td>最常用，绝大多数信号电路</td></tr>
+      <tr><td class="num">0805</td><td class="num">2.0 × 1.25</td><td class="num">1/8 W · 125 mW</td><td>手焊友好</td></tr>
+      <tr><td class="num">1206</td><td class="num">3.2 × 1.6</td><td class="num">1/4 W · 250 mW</td><td>功率稍大的位置</td></tr>
+      <tr><td class="num">2010</td><td class="num">5.0 × 2.5</td><td class="num">1/2 W · 500 mW</td><td>电源、限流</td></tr>
+      <tr><td class="num">2512</td><td class="num">6.4 × 3.2</td><td class="num">1 W</td><td>电流采样电阻</td></tr>
+    </tbody>
+  </table></div>
+  <div class="key"><b>降额使用：</b>实际功率最好不超过额定功率的 <b>一半</b>。额定值是在理想散热条件下测的，板子上元件挤在一起、外壳里不通风，实际扛不了那么多。工程上把这叫<b>降额（derating）</b>。</div>
+</section>
+
+<section>
+  <h2><span class="n">STEP 4</span>动手算：LED 限流电阻</h2>
+  <p>LED 两端有一个基本固定的压降（红色约 2V，蓝 / 白 / 绿约 3V），剩下的电压全部落在电阻上。电阻上的功率就是"多出来的电压 × 电流"。调一调，看看什么时候 0603 扛不住：</p>
+  <figure>
+    <div class="ctrl">
+      <label for="vs">电源电压
+        <select id="vs">
+          <option value="3.3">3.3 V（MCU 引脚）</option>
+          <option value="5">5 V（USB）</option>
+          <option value="12" selected>12 V（适配器）</option>
+          <option value="24">24 V（工业电源）</option>
+        </select></label>
+      <label for="vf">LED 颜色
+        <select id="vf">
+          <option value="2.0" selected>红色 · 压降约 2.0 V</option>
+          <option value="3.0">白 / 蓝 / 绿 · 压降约 3.0 V</option>
+        </select></label>
+      <label for="il">LED 电流 <output id="ilOut"></output><input id="il" type="range" min="2" max="20" step="1" value="20"></label>
+    </div>
+    <div class="calcline" id="ledCalc"></div>
+    <div class="readout">
+      <div><span>算出的电阻</span><strong id="rCalc">–</strong></div>
+      <div><span>选标准值（E24）</span><strong id="rStd">–</strong></div>
+      <div class="hot"><span>电阻发热</span><strong id="pR">–</strong></div>
+      <div><span>至少要用</span><strong id="pkgOut">–</strong></div>
+    </div>
+    <div class="verdict" id="verdict"></div>
+    <figcaption>标准值取比计算值大一点的那个，电流只会稍小一点，更安全。"至少要用"按降额一半来选：封装额定功率 ≥ 实际功率 × 2。</figcaption>
+  </figure>
+  <p>换到 3.3V 或 5V 再看：电阻上只剩 1~3V，发热只有几十 mW，0603 轻松扛住。<b>电源电压越高，限流电阻浪费的就越多</b>，这也是为什么 12V 灯带里都是几颗 LED 串起来用，让 LED 自己分掉大部分电压。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 5</span>效率：有多少电没白费</h2>
+  <div class="formulas" style="grid-template-columns:1fr"><div><strong>效率 η = 输出功率 ÷ 输入功率</strong><span>没变成有用输出的那部分，全变成了热</span></div></div>
+  <p>最典型的例子是给 MCU 供 3.3V。最简单的办法是用一颗 <b>LDO（线性稳压器）</b>：它像一个自动调节的电阻，把多出来的电压"烧掉"，电流原样通过。</p>
+  <figure>
+    <div class="scroll"><svg id="eff" viewBox="0 0 640 230" role="img" aria-label="三种供电方式的有用功率和发热对比"></svg></div>
+    <figcaption>同样给 3.3V、200 mA 的负载供电（有用功率 0.66 W）。绿色是送到负载的，铜色是变成热扔掉的。条长按功率比例画。</figcaption>
+  </figure>
+  <pre>LDO 的电流"进多少出多少"：输入 200 mA，输出也是 200 mA
+5V  → 3.3V：输入 5 × 0.2 = 1.0 W，输出 0.66 W，发热 0.34 W，效率 66%
+12V → 3.3V：输入 12 × 0.2 = 2.4 W，输出 0.66 W，发热 1.74 W，效率 28%</pre>
+  <p>12V 降到 3.3V 时，LDO 自己发的热是负载的将近 3 倍。<b>开关电源（DC-DC）</b>用快速开关加电感来变换电压（还记得变压器那课：频率越高，元件越小），效率能到 85% ~ 95%，发热小得多。代价是电路更复杂、输出有纹波。电源那一章会细讲怎么选。</p>
+</section>
+
+<section>
+  <h2><span class="n">STEP 6</span>热量要有地方去</h2>
+  <p>芯片手册里有一个参数叫<b>热阻 θJA</b>，单位 °C/W，意思是"每消耗 1 W，芯片比周围空气热多少度"：</p>
+  <div class="formulas" style="grid-template-columns:1fr"><div><strong>温升 = 功率 × 热阻</strong><span>芯片温度 = 环境温度 + 温升，不能超过手册上的最高结温（常见 125 °C）</span></div></div>
+  <pre>12V → 3.3V 的 LDO，发热 1.74 W，SOT-223 封装热阻约 60 °C/W（典型值）
+温升 = 1.74 × 60 ≈ 104 °C
+芯片温度 = 25 + 104 = 129 °C  → 超过 125 °C，LDO 过热保护，反复断电重启</pre>
+  <p>解决办法：换开关电源；或者给芯片下面铺大片铜皮帮它散热（热阻能降不少）；或者先用开关电源降到 5V，再用 LDO 降到 3.3V。这些在 PCB 和电源章节都会碰到。</p>
+</section>
+
+<section>
+  <h2><span class="n">ANSWER</span>揭晓谜题</h2>
+  <p>阻值是对的，<b>功率</b>没算。12V 点红色 LED，电阻上要扛 10V：</p>
+  <pre>P = V × I = 10 V × 0.0196 A ≈ 0.196 W ≈ 200 mW
+0603 额定功率只有 100 mW → 实际是额定的 2 倍，必然过热</pre>
+  <p>按降额一半的规矩，需要额定 400 mW 以上的封装，也就是 2010。或者干脆换个思路：把 LED 电流降到 5 mA（指示灯其实足够亮），电阻功率就只有 50 mW 了。</p>
+  <div class="key"><b>以后选任何电阻，都算两个数：</b>阻值（R = V ÷ I）和功率（P = V × I）。只算第一个，就会遇到谜题里的事。</div>
+</section>
+
+<section class="key" style="gap:10px">
+  <h2 style="font-size:1.2rem">三句话总结</h2>
+  <ol class="sum">
+    <li><b>P = VI = I²R = V²/R</b>，看手上有哪两个量选哪个；电流翻倍，电阻发热翻 4 倍</li>
+    <li>电阻消耗的功率全变成热；封装越大额定功率越高，<b>实际功率不超过额定的一半</b></li>
+    <li><b>效率 = 输出 ÷ 输入</b>，其余全是热；温升 = 功率 × 热阻，LDO 压差大时会过热</li>
+  </ol>
+</section>
+<p class="lede" style="font-size:.9rem">第二阶段电学基础到这里结束。下一阶段 §5：基础电路理论（串并联、分压、KCL / KVL）。</p>
+</main>
+
+<script>
+(function(){
+  var ns='http://www.w3.org/2000/svg';
+  function el(tag,a,t){var e=document.createElementNS(ns,tag);for(var k in a)e.setAttribute(k,a[k]);if(t!=null)e.textContent=t;return e;}
+
+  /* packages to scale: 1 mm = 25 px */
+  var pk=[['0402',1.0,0.5,'62.5 mW'],['0603',1.6,0.8,'100 mW'],['0805',2.0,1.25,'125 mW'],['1206',3.2,1.6,'250 mW'],['2010',5.0,2.5,'500 mW'],['2512',6.4,3.2,'1 W']];
+  var s=document.getElementById('pkg'),S=25,x=16,base=130;
+  pk.forEach(function(p){
+    var w=p[1]*S,h=p[2]*S,y=base-h,cap=Math.max(w*0.18,3);
+    s.appendChild(el('rect',{x:x,y:y,width:w,height:h,fill:'var(--fg)',rx:1}));
+    s.appendChild(el('rect',{x:x,y:y,width:cap,height:h,fill:'var(--muted)'}));
+    s.appendChild(el('rect',{x:x+w-cap,y:y,width:cap,height:h,fill:'var(--muted)'}));
+    s.appendChild(el('text',{x:x+w/2,y:base+24,'text-anchor':'middle','font-size':14,'font-weight':700,'class':'m'},p[0]));
+    s.appendChild(el('text',{x:x+w/2,y:base+44,'text-anchor':'middle','font-size':12,'class':'m cu'},p[3]));
+    x+=Math.max(w,58)+14;
+  });
+
+  /* LED resistor calculator */
+  var E24=[10,11,12,13,15,16,18,20,22,24,27,30,33,36,39,43,47,51,56,62,68,75,82,91];
+  function stdUp(r){var d=Math.pow(10,Math.floor(Math.log10(r)));for(var k=0;k<3;k++){for(var i=0;i<E24.length;i++){var v=E24[i]*d/10;if(v>=r*0.999)return v;}d*=10;}return r;}
+  var PK=[['0402',0.0625],['0603',0.1],['0805',0.125],['1206',0.25],['2010',0.5],['2512',1]];
+  function fR(r){return r>=1000?(r/1000).toFixed(r%1000?1:0)+' kΩ':r.toFixed(0)+' Ω';}
+  function fP(w){return w<1?(w*1000).toFixed(0)+' mW':w.toFixed(2)+' W';}
+  var vs=document.getElementById('vs'),vf=document.getElementById('vf'),il=document.getElementById('il');
+  function led(){
+    var V=+vs.value,F=+vf.value,I=+il.value/1000;
+    document.getElementById('ilOut').textContent=il.value+' mA';
+    var calc=document.getElementById('ledCalc'),ver=document.getElementById('verdict');
+    if(V<=F+0.2){
+      calc.innerHTML='电源电压不够：'+V+' V 减去 LED 的 '+F+' V，几乎不剩，点不亮这种颜色的 LED';
+      ['rCalc','rStd','pR','pkgOut'].forEach(function(id){document.getElementById(id).textContent='–';});
+      ver.className='verdict bad';ver.textContent='换一个更高的电源电压，或者换压降低的红色 LED。';return;
+    }
+    var Vr=V-F,R=Vr/I,Rs=stdUp(R),Ia=Vr/Rs,P=Vr*Ia;
+    calc.innerHTML='R = ('+V+' − '+F+') V ÷ '+il.value+' mA = <b>'+fR(R)+'</b>　·　P = '+Vr.toFixed(1)+' V × '+(Ia*1000).toFixed(1)+' mA = <b>'+fP(P)+'</b>';
+    document.getElementById('rCalc').textContent=fR(R);
+    document.getElementById('rStd').textContent=fR(Rs);
+    document.getElementById('pR').textContent=fP(P);
+    var need=PK.find(function(p){return p[1]>=P*2;});
+    document.getElementById('pkgOut').textContent=need?need[0]:'更大功率电阻';
+    var ratio=P/0.1*100;
+    if(P>0.1){ver.className='verdict bad';ver.innerHTML='0603（100 mW）会烧：实际功率是它额定值的 <b>'+ratio.toFixed(0)+'%</b>。';}
+    else if(P>0.05){ver.className='verdict bad';ver.innerHTML='0603 勉强不烧，但用到了额定值的 <b>'+ratio.toFixed(0)+'%</b>，超过一半，长期会很烫。';}
+    else{ver.className='verdict ok';ver.innerHTML='0603 没问题：只用到额定值的 <b>'+ratio.toFixed(0)+'%</b>。';}
+  }
+  [vs,vf,il].forEach(function(e){e.addEventListener('input',led);});
+  led();
+
+  /* efficiency bars, to scale: 1 W = 160 px */
+  var ef=document.getElementById('eff'),W=160,X0=170;
+  [['LDO 5V → 3.3V',0.66,0.34,'66%'],['LDO 12V → 3.3V',0.66,1.74,'28%'],['开关电源 12V → 3.3V',0.66,0.07,'约 90%']].forEach(function(r,i){
+    var y=20+i*62,gw=r[1]*W,hw=r[2]*W;
+    ef.appendChild(el('text',{x:X0-10,y:y+22,'text-anchor':'end','font-size':13,'font-weight':700},r[0]));
+    ef.appendChild(el('rect',{x:X0,y:y+6,width:gw,height:24,fill:'var(--mask)'}));
+    ef.appendChild(el('rect',{x:X0+gw,y:y+6,width:hw,height:24,fill:'var(--copper)'}));
+    ef.appendChild(el('text',{x:X0+gw+hw+8,y:y+23,'font-size':13,'class':'m'},'效率 '+r[3]));
+    ef.appendChild(el('text',{x:X0,y:y+48,'font-size':12,'class':'m mut'},'有用 0.66 W · 发热 '+r[2].toFixed(2)+' W'));
+  });
+  ef.appendChild(el('rect',{x:X0,y:206,width:10,height:10,fill:'var(--mask)'}));
+  ef.appendChild(el('text',{x:X0+16,y:215,'font-size':12,'class':'mut'},'送到负载'));
+  ef.appendChild(el('rect',{x:X0+90,y:206,width:10,height:10,fill:'var(--copper)'}));
+  ef.appendChild(el('text',{x:X0+106,y:215,'font-size':12,'class':'mut'},'变成热'));
+})();
+</script>
